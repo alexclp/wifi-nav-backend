@@ -19,5 +19,12 @@ extension Droplet {
         }
 
         get("description") { req in return req.description }
+
+        post("determinePosition") { req in 
+            if let json = req.json {
+
+            }    
+            return req.description 
+        }
     }
 }
