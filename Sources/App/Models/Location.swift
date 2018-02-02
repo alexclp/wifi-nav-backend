@@ -1,4 +1,5 @@
 import Vapor
+import FluentProvider
 
 final class Location: Model {
     let storage = Storage()
@@ -32,6 +33,7 @@ final class Location: Model {
         try row.set("x", x)
         try row.set("y", y)
         try row.set("roomID", roomID)
+        return row
     }
 }
 
@@ -69,7 +71,7 @@ extension Location: JSONInitializable {
     convenience init(json: JSON) throws {
         let x: Double = try json.get(Location.Keys.x)
         let y: Double = try json.get(Location.Keys.y)
-        let roomID: Identifier = try json.get(Location.Keys.roomID)
+        let roomID: Int = try json.get(Location.Keys.roomID)
         self.init(x: x, y: y, roomID: roomID)
     }
 }
