@@ -1,13 +1,23 @@
 import Vapor
 import Foundation
 
+
+
+struct MeasurementsJSONArray: Decodable {
+    struct MeasurementElement: Decodable {
+        let signalStrength: Int
+        let name: String
+        let macAddress: String
+    }
+    let measurements: [MeasurementElement]
+}
+
 extension Droplet {
+    
     func setupRoutes() throws {
         post("determinePosition") { req in 
-            // req.body = json
-            let mirror = Mirror(reflecting: req)
-            print(mirror.subjectType)
-            return "AA"
+            print(try req.decodeJSONBody(MeasurementsJSONArray.self))
+            return "Response"
         }
     }
 }
