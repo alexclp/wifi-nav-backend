@@ -1,8 +1,12 @@
 import Vapor
-import FluentProvider
+import Foundation
 
-final class PositionCalculator {
-    let storage = Storage()
+final class PositionCalculator: NSObject {
+    static let shared = PositionCalculator()
 
-    
+	private override init() { }
+
+    func determinePosition(for data: Data) {
+
+    }
 }
