@@ -36,7 +36,7 @@ extension Droplet {
                                 } else {
                                     var responseJSON = JSON()
                                     try responseJSON.set("success", false)
-                                    portal.close(with: try Response(status: .notFound, json: responseJSON))
+                                    portal.close(with: try Response(status: .badRequest, json: responseJSON))
                                 }
                             } catch {
                                 print(error.localizedDescription)
