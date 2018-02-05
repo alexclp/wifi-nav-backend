@@ -28,11 +28,15 @@ extension Droplet {
                             do {
                                 if success == true {
                                     if let id = id {
-                                        portal.close(with: "\(id)")
+                                        var responseJSON = JSON()
+                                        try responseJSON.set("success", true)
+                                        try responseJSON.set("locationID", id)
+                                        portal.close(with: try Response(status: .ok, json: responseJSON))
                                     }
                                 } else {
-                                    throw Abort.badRequest
-                                    portal.close(with: "-1")
+                                    var responseJSON = JSON()
+                                    try responseJSON.set("success", false)
+                                    portal.close(with: try Response(status: .notFound, json: responseJSON))
                                 }
                             } catch {
                                 print(error.localizedDescription)
