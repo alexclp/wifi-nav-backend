@@ -20,10 +20,29 @@ struct MeasurementsJSONCollection: Decodable {
 extension Droplet {
     func setupRoutes() throws {
         post("determinePosition") { req in 
-            print(try req.decodeJSONBody(MeasurementsJSONCollection.self))
-            let measurementsCollection = try req.decodeJSONBody(MeasurementsJSONCollection.self)
-            PositionCalculator.shared.determinePosition(for: measurementsCollection)
-            return "Response"
+            return try Response.async { portal in
+                _ = try background {
+                    do {
+                        let measurementsCollection = try req.decodeJSONBody(MeasurementsJSONCollection.self)
+                        PositionCalculator.shared.determinePosition(for: measurementsCollection) { (success, id) in
+                            do {
+                                if success == true {
+                                    if let id = id {
+                                        portal.close(with: "\(id)")
+                                    }
+                                } else {
+                                    throw Abort.badRequest
+                                    portal.close(with: "-1")
+                                }
+                            } catch {
+                                print(error.localizedDescription)
+                            }
+                        }
+                    } catch {
+                        portal.close(with: error)
+                    }
+                }
+            }
         }
     }
 }

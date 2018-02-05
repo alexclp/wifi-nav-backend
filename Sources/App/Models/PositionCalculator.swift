@@ -7,21 +7,57 @@ final class PositionCalculator: NSObject {
 
 	private override init() { }
 
-    func determinePosition(for measurementsCollection: MeasurementsJSONCollection) {
-        for measurement in measurementsCollection.measurements {
-            let currentScanMac = measurement.macAddress
-            print(currentScanMac)
+    func determinePosition(for measurementsCollection: MeasurementsJSONCollection, completion: @escaping (Bool, Int?) -> Void) {
+        var locationsMarks = [Int: Int]()
+        var minDiff = 99999999999999999
+        var minLocationID = 0
+        let measurementsSize = measurementsCollection.measurements.count
+        var measurementCurrentCount = 0
+
+        for currentScanMeasurement in measurementsCollection.measurements {
+            let currentScanMac = currentScanMeasurement.macAddress
+            let currentScanSignalStrength = currentScanMeasurement.signalStrength
+          
             searchForOldMeasurements(for: currentScanMac, completion: { (success, oldMeasurements) in
+                measurementCurrentCount = measurementCurrentCount + 1
                 if success == true {
-                    guard let m = oldMeasurements else { print("Nothing found"); return }
-                    print(m)
+                    guard let oldMeasurements = oldMeasurements else { print("Nothing found"); return }
+                    for oldMeasurement in oldMeasurements {
+                        if let oldSignalStrength = oldMeasurement["signalStrength"] as? Int, let oldLocationID = oldMeasurement["locationID"] as? Int {
+                            let diff = currentScanSignalStrength - oldSignalStrength
+                            if diff < minDiff {
+                                minDiff = diff
+                                minLocationID = oldLocationID
+                            }
+                        }
+                    }
+
+                    if locationsMarks[minLocationID] != nil {
+                        locationsMarks[minLocationID] = locationsMarks[minLocationID]! + 1
+                    } else {
+                        locationsMarks[minLocationID] = 1
+                    }
+                } else {
+
+                }
+
+                if measurementCurrentCount == measurementsSize {
+                    var locationID = 0
+                    var count = 0
+                    for (key, value) in locationsMarks {
+                        if value > count {
+                            count = value
+                            locationID = key
+                        }
+                    }
+                    print("The maximum count is: \(count)")
+                    completion(true, locationID)
                 }
             })
-        }
+        }     
     }
 
-    private func searchForOldMeasurements(for macAddress: String, completion: @escaping (Bool, [MeasurementElement]?) -> Void) {
-        var toReturn = [MeasurementElement]()
+    private func searchForOldMeasurements(for macAddress: String, completion: @escaping (Bool, [[String: Any]]?) -> Void) {
         HTTPClient.shared.request(urlString: baseURLAPI + "/measurements/address/\(macAddress)", method: "GET", parameters: nil) { (success, data) in
             if success == true {
                 do {
@@ -32,11 +68,7 @@ final class PositionCalculator: NSObject {
                     }
                     if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]] {
                         print(json)
-                        for network in json {
-                            if let signal = network["signalStrength"] as? Int {
-                                toReturn.append(MeasurementElement(signalStrength: signal, name: "Current", macAddress: macAddress))
-                            }  
-                        }
+                        completion(true, json)
                     } else {
                         completion(false, nil)
                     }
