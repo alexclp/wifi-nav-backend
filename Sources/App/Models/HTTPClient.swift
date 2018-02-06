@@ -10,6 +10,7 @@ import Foundation
 
 class HTTPClient: NSObject {
 	static let shared = HTTPClient()
+	private let urlSession = URLSession.init(configuration: URLSessionConfiguration.default)
 
 	private override init() { }
 	
@@ -22,9 +23,7 @@ class HTTPClient: NSObject {
 			urlRequest.httpBody = paramString.data(using: .utf8)
 		}
 
-		let configuration = URLSessionConfiguration.default
-		let session = URLSession.init(configuration: configuration)
-		let task = session.dataTask(with: urlRequest, completionHandler: { (data, response, error) in
+		let task = urlSession.dataTask(with: urlRequest, completionHandler: { (data, response, error) in
 			guard error == nil else {
 				print(error!)
 				completion(false, nil)
