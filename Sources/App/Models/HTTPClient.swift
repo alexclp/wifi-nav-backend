@@ -21,8 +21,10 @@ class HTTPClient: NSObject {
 		if let paramString =  parameters?.jsonString() {
 			urlRequest.httpBody = paramString.data(using: .utf8)
 		}
-		
-		let task = URLSession.shared.dataTask(with: urlRequest, completionHandler: { (data, response, error) in
+
+		let configuration = URLSessionConfiguration.default
+		let session = URLSession.init(configuration: configuration)
+		let task = session.dataTask(with: urlRequest, completionHandler: { (data, response, error) in
 			guard error == nil else {
 				print(error!)
 				completion(false, nil)
