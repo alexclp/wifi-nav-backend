@@ -50,7 +50,6 @@ final class PositionCalculator: NSObject {
                             locationID = key
                         }
                     }
-                    print("The maximum count is: \(count)")
                     completion(true, locationID)
                 }
             })
@@ -61,7 +60,6 @@ final class PositionCalculator: NSObject {
         HTTPClient.shared.request(urlString: baseURLAPI + "/measurements/address/\(macAddress)", method: "GET", parameters: nil) { (success, data) in
             if success == true {
                 do {
-                    print("Succesfully got the measurements for address \(macAddress)")
                     guard let data = data else { 
                         completion(false, nil)
                         return 
@@ -78,7 +76,6 @@ final class PositionCalculator: NSObject {
                     completion(false, nil)
 				} 
             }  else {
-                print("Failed to get the measurements for address \(macAddress)")
                 completion(false, nil)
             }
         }
