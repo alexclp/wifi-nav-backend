@@ -17,15 +17,32 @@ struct MeasurementsJSONCollection: Decodable {
     let measurements: [MeasurementElement]
 }
 
+struct Location: Decodable {
+    let id: Int
+    let x: Double
+    let y: Double
+    let roomID: Int
+}
+
 extension Droplet {
     func setupRoutes() throws {
         post("determinePosition") { req in 
             let measurementsCollection = try req.decodeJSONBody(MeasurementsJSONCollection.self)
-            let locationID = PositionCalculator.shared.determinePosition(for: measurementsCollection)
-            var responseJSON = JSON()
-            try responseJSON.set("success", true)
-            try responseJSON.set("locationID", locationID)
-            return responseJSON
+            let location = PositionCalculator.shared.determinePosition(for: measurementsCollection)
+            if let location = location {
+                var responseJSON = JSON()
+                try responseJSON.set("success", true)
+                try responseJSON.set("id", location.id)
+                try responseJSON.set("x", location.x)
+                try responseJSON.set("y", location.y)
+                try responseJSON.set("roomID", location.roomID)
+                return responseJSON
+            } else {
+                var responseJSON = JSON()
+                try responseJSON.set("success", false)
+                return responseJSON
+            }
+            
         }
     }
 }

@@ -19,8 +19,7 @@ final class PositionCalculator: NSObject {
 
 	private override init() { }
 
-    func determinePosition(for measurementsCollection: MeasurementsJSONCollection) -> Int? {
-        // print(searchForOldMeasurements(for: "00:62:EC:FD:E9:10"))
+    func determinePosition(for measurementsCollection: MeasurementsJSONCollection) -> Location? {
         var locationsMarks = [Int: Int]()
         var minDiff = 99999999999999999
         var minLocationID = 0
@@ -53,43 +52,30 @@ final class PositionCalculator: NSObject {
                 locationID = key
             }
         }
-        return locationID
-        //     searchForOldMeasurements(for: currentScanMac, completion: { (success, oldMeasurements) in
-        //         measurementCurrentCount = measurementCurrentCount + 1
-        //         if success == true {
-        //             guard let oldMeasurements = oldMeasurements else { print("Nothing found"); return }
-        //             for oldMeasurement in oldMeasurements {
-        //                 if let oldSignalStrength = oldMeasurement["signalStrength"] as? Int, let oldLocationID = oldMeasurement["locationID"] as? Int {
-        //                     let diff = currentScanSignalStrength - oldSignalStrength
-        //                     if diff < minDiff {
-        //                         minDiff = diff
-        //                         minLocationID = oldLocationID
-        //                     }
-        //                 }
-        //             }
 
-        //             if locationsMarks[minLocationID] != nil {
-        //                 locationsMarks[minLocationID] = locationsMarks[minLocationID]! + 1
-        //             } else {
-        //                 locationsMarks[minLocationID] = 1
-        //             }
-        //         } else {
+        guard let location = getLocationDetails(for: locationID) else { return nil }
+        return location 
+    }
 
-        //         }
+    private func getLocationDetails(for locationID: Int) -> Location? {
+        do {
+            let config = try Config()
+            try config.setup()
+    
+            let drop = try Droplet(config)
+            try drop.setup()
 
-        //         if measurementCurrentCount == measurementsSize {
-        //             var locationID = 0
-        //             var count = 0
-        //             for (key, value) in locationsMarks {
-        //                 if value > count {
-        //                     count = value
-        //                     locationID = key
-        //                 }
-        //             }
-        //             completion(true, locationID)
-        //         }
-        //     })
-        // }     
+            let urlString = "\(baseURLAPI)/locations/\(locationID)"
+            let response = try drop.client.get(urlString)
+            if response.status == Status.ok {
+                let location = try response.decodeJSONBody(Location.self)
+                return location
+            }
+        } catch {
+            print(error)
+            print(error.localizedDescription)
+        }
+        return nil
     }
     
     private func searchForOldMeasurements(for macAddress: String) -> MeasurementsSearchResult? {
@@ -101,18 +87,11 @@ final class PositionCalculator: NSObject {
             try drop.setup()
 
             let urlString = "\(baseURLAPI)/measurements/address/\(macAddress)"
-            print(urlString)
             let response = try drop.client.get(urlString)
-            print(response)
-            // if response.status == Status.ok {
+            if response.status == Status.ok {
                 let measurementResults = try response.decodeJSONBody(MeasurementsSearchResult.self)
-                print("aaaaaaaa")
-                print(measurementResults)
                 return measurementResults
-            // }
-
-            
-
+            }
         } catch {
             print(error)
             print(error.localizedDescription)
