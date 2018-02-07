@@ -20,33 +20,12 @@ struct MeasurementsJSONCollection: Decodable {
 extension Droplet {
     func setupRoutes() throws {
         post("determinePosition") { req in 
-            return try Response.async { portal in
-                _ = try background {
-                    do {
-                        let measurementsCollection = try req.decodeJSONBody(MeasurementsJSONCollection.self)
-                        PositionCalculator.shared.determinePosition(for: measurementsCollection) { (success, id) in
-                            do {
-                                if success == true {
-                                    if let id = id {
-                                        var responseJSON = JSON()
-                                        try responseJSON.set("success", true)
-                                        try responseJSON.set("locationID", id)
-                                        portal.close(with: try Response(status: .ok, json: responseJSON))
-                                    }
-                                } else {
-                                    var responseJSON = JSON()
-                                    try responseJSON.set("success", false)
-                                    portal.close(with: try Response(status: .badRequest, json: responseJSON))
-                                }
-                            } catch {
-                                print(error.localizedDescription)
-                            }
-                        }
-                    } catch {
-                        portal.close(with: error)
-                    }
-                }
-            }
+            let measurementsCollection = try req.decodeJSONBody(MeasurementsJSONCollection.self)
+            let locationID = PositionCalculator.shared.determinePosition(for: measurementsCollection)
+            var responseJSON = JSON()
+            try responseJSON.set("success", true)
+            try responseJSON.set("locationID", locationID)
+            return responseJSON
         }
     }
 }
