@@ -17,6 +17,11 @@ struct MeasurementsJSONCollection: Decodable {
     let measurements: [MeasurementElement]
 }
 
+struct NavigationRequestJSON: Decodable {
+    let startLocationID: Int
+    let finishLocationID: Int 
+}
+
 extension Droplet {
     func setupRoutes() throws {
         post("determinePosition") { req in 
@@ -38,8 +43,19 @@ extension Droplet {
             
         }
 
-        get("testPath") { req in  
-            return "OK"
+        post("calculateRoute") { req in  
+            let requestJSON = try req.decodeJSONBody(NavigationRequestJSON.self)
+            if let result = NavigationEngine.shared.shortestPath(start: requestJSON.startLocationID, finish: requestJSON.finishLocationID) {
+                var responseJSON = JSON()
+                try responseJSON.set("success", true)
+                try responseJSON.set("path", result["path"] as! [Int])
+                try responseJSON.set("distance", result["distance"] as! Double)
+                return responseJSON
+            } else {
+                var responseJSON = JSON()
+                try responseJSON.set("success", false)
+                return responseJSON
+            }
         }
     } 
 }
