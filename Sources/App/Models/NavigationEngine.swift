@@ -117,7 +117,6 @@ final class NavigationEngine: NSObject {
         q.append(start)
 
         while(q.count != 0) {
-            print("In while")
             let currentPair = getMinimumDistanceElement(in: q, with: distance)
             let node = currentPair.0
             q.remove(at: currentPair.1)
@@ -132,9 +131,29 @@ final class NavigationEngine: NSObject {
                 }
             }
         }
+
         print(prev)
         print(distance)
         return 0
+    }
+
+    func createPath(parentsList: [Int: Int], distances: [Int: Double], start: Int, finish: Int) -> [String: Any]? {
+        var path = [Int]()
+        var currentNode = finish
+        path.append(currentNode)
+        while (currentNode != start) {
+            path.append(parentsList[currentNode])
+            currentNode = parentsList[currentNode]
+        }
+
+        if path[path.count - 1] != start {
+            return nil
+        }
+        
+        return [
+            "distance": distances[finish],
+            "path": path.reversed()
+        ]
     }
 
     func getDistance(from id1: Int, to id2: Int) -> Double {
