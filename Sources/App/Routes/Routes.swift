@@ -17,13 +17,6 @@ struct MeasurementsJSONCollection: Decodable {
     let measurements: [MeasurementElement]
 }
 
-struct Location: Decodable {
-    let id: Int
-    let x: Double
-    let y: Double
-    let roomID: Int
-}
-
 extension Droplet {
     func setupRoutes() throws {
         post("determinePosition") { req in 
@@ -44,5 +37,10 @@ extension Droplet {
             }
             
         }
-    }
+
+        get("testPath") { req in  
+            NavigationEngine.shared.shortestPath(start: 3, finish: 16)
+            return "OK"
+        }
+    } 
 }
