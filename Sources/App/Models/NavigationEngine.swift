@@ -95,7 +95,7 @@ final class NavigationEngine: NSObject {
         return (minimumElement, index!)
     }
 
-    func shortestPath(start: Int, finish: Int) -> Int? {
+    func shortestPath(start: Int, finish: Int) -> [String: Any]? {
         createGraph()
         print(edges)
         var prev = [Int: Int]()
@@ -134,7 +134,7 @@ final class NavigationEngine: NSObject {
 
         print(prev)
         print(distance)
-        return 0
+        return createPath(parentsList: prev, distances: distance, start: startLocation.id, finish: finishLocation.id))
     }
 
     func createPath(parentsList: [Int: Int], distances: [Int: Double], start: Int, finish: Int) -> [String: Any]? {
@@ -142,8 +142,8 @@ final class NavigationEngine: NSObject {
         var currentNode = finish
         path.append(currentNode)
         while (currentNode != start) {
-            path.append(parentsList[currentNode])
-            currentNode = parentsList[currentNode]
+            path.append(parentsList[currentNode]!)
+            currentNode = parentsList[currentNode]!
         }
 
         if path[path.count - 1] != start {
@@ -151,9 +151,9 @@ final class NavigationEngine: NSObject {
         }
         
         return [
-            "distance": distances[finish],
-            "path": path.reversed()
-        ]
+            "distance": distances[finish]!,
+            "path": path.reversed() as [Int]
+        ] as [String: Any]
     }
 
     func getDistance(from id1: Int, to id2: Int) -> Double {
