@@ -134,7 +134,7 @@ final class NavigationEngine: NSObject {
 
         print(prev)
         print(distance)
-        return createPath(parentsList: prev, distances: distance, start: startLocation.id, finish: finishLocation.id))
+        return createPath(parentsList: prev, distances: distance, start: startLocation.id, finish: finishLocation.id)
     }
 
     func createPath(parentsList: [Int: Int], distances: [Int: Double], start: Int, finish: Int) -> [String: Any]? {

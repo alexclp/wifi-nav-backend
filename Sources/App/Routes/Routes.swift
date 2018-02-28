@@ -39,7 +39,6 @@ extension Droplet {
         }
 
         get("testPath") { req in  
-            NavigationEngine.shared.shortestPath(start: 3, finish: 16)
             return "OK"
         }
     } 
