@@ -36,6 +36,8 @@ extension Droplet {
                 try responseJSON.set("roomID", location.roomID)
                 try responseJSON.set("standardHeight", location.standardHeight)
                 try responseJSON.set("standardWidth", location.standardWidth)
+                try responseJSON.set("latitude", location.latitude)
+                try responseJSON.set("longitude", location.longitude)
                 return responseJSON
             } else {
                 var responseJSON = JSON()
