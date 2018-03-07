@@ -142,8 +142,10 @@ final class NavigationEngine: NSObject {
         var currentNode = finish
         path.append(currentNode)
         while (currentNode != start) {
-            path.append(parentsList[currentNode]!)
-            currentNode = parentsList[currentNode]!
+            if parentsList[currentNode] != nil {
+                path.append(parentsList[currentNode]!)
+                currentNode = parentsList[currentNode]!
+            }
         }
 
         if path[path.count - 1] != start {
