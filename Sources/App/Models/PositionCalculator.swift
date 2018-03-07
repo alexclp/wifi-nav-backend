@@ -28,9 +28,9 @@ final class PositionCalculator: NSObject {
             let currentScanMac = currentScanMeasurement.macAddress
             let currentScanSignalStrength = currentScanMeasurement.signalStrength
 
-            guard let searchResults = searchForOldMeasurements(for: currentScanMac)?.results else { continue }
+            guard let searchResults = searchForOldMeasurements(for: currentScanMac)?.results else { print("Not found!"); continue }
             for result in searchResults {
-                let diff = currentScanSignalStrength - result.signalStrength
+                let diff = abs((currentScanSignalStrength * -1) - (result.signalStrength * -1))
                 if diff < minDiff {
                     minDiff = diff
                     minLocationID = result.locationID
@@ -52,7 +52,7 @@ final class PositionCalculator: NSObject {
                 locationID = key
             }
         }
-
+        print(locationsMarks)
         guard let location = getLocationDetails(for: locationID) else { return nil }
         return location 
     }
