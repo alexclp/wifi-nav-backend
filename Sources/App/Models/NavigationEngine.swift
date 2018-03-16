@@ -87,6 +87,9 @@ final class NavigationEngine: NSObject {
         var visited = [Int: Bool]()
         var distance = [Int: Double]()
 
+        print("Start: \(start)")
+        print("Finish: \(finish)")
+
         guard let startLocation = NetworkingHelper.shared.fetchLocation(with: start) else { return nil }
         guard let finishLocation = NetworkingHelper.shared.fetchLocation(with: finish) else { return nil }
 
@@ -114,15 +117,19 @@ final class NavigationEngine: NSObject {
             visited[node] = false
             if let edges = edges[node] {
                 for neighbour in edges {
-                    let alt = distance[node]! + getDistance(from: node, to: neighbour)
-                    if let neighbourDistance = distance[neighbour] {
-                        if alt < neighbourDistance {
-                            distance[neighbour] = alt
-                            prev[neighbour] = node
-                            queue.insert(neighbour)
+                    if let dist = distance[node] {
+                        let alt = dist + getDistance(from: node, to: neighbour)
+                        if let neighbourDistance = distance[neighbour] {
+                            if alt < neighbourDistance {
+                                distance[neighbour] = alt
+                                prev[neighbour] = node
+                                queue.insert(neighbour)
+                            }
+                        } else {
+                            distance[neighbour] = INF
                         }
                     } else {
-                        distance[neighbour] = INF
+                        distance[node] = 0
                     }
                 }
             }
