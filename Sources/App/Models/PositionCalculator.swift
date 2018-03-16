@@ -21,12 +21,13 @@ final class PositionCalculator: NSObject {
 
     func determinePosition(for measurementsCollection: MeasurementsJSONCollection) -> Location? {
         var locationsMarks = [Int: Int]()
-        var minDiff = 99999999999999999
-        var minLocationID = 0
 
         for currentScanMeasurement in measurementsCollection.measurements {
             let currentScanMac = currentScanMeasurement.macAddress
             let currentScanSignalStrength = currentScanMeasurement.signalStrength
+            
+            var minDiff = 99999999999999999
+            var minLocationID = 0
 
             guard let searchResults = searchForOldMeasurements(for: currentScanMac)?.results else { print("Not found!"); continue }
             for result in searchResults {
