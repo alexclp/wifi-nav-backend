@@ -22,6 +22,12 @@ struct NavigationRequestJSON: Decodable {
     let finishLocationID: Int 
 }
 
+struct Room: Decodable {
+    let id: Int
+    let name: String
+    let floorNumber: Int
+}
+
 extension Droplet {
     func setupRoutes() throws {
         post("determinePosition") { req in 
@@ -38,6 +44,11 @@ extension Droplet {
                 try responseJSON.set("standardWidth", location.standardWidth)
                 try responseJSON.set("latitude", location.latitude)
                 try responseJSON.set("longitude", location.longitude)
+
+                if let room =  NetworkingHelper.shared.fetchRoom(with: location.roomID) {
+                    try responseJSON.set("floorNumber", room.floorNumber)
+                }
+
                 return responseJSON
             } else {
                 var responseJSON = JSON()

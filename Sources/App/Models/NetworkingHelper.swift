@@ -71,4 +71,25 @@ final class NetworkingHelper: NSObject {
         }
         return nil
     }
+
+    func fetchRoom(with id: Int) -> Room? {
+        do {
+            let config = try Config()
+            try config.setup()
+
+            let drop = try Droplet(config)
+            try drop.setup()
+
+            let urlString = "\(baseURLAPI)/rooms/\(id)"
+            let response = try drop.client.get(urlString)
+            if response.status == Status.ok {
+                let room = try response.decodeJSONBody(Room.self)
+                return room
+            }
+        } catch {
+            print(error)
+            print(error.localizedDescription)
+        }
+        return nil
+    }
 }
