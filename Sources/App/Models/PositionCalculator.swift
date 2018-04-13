@@ -17,19 +17,21 @@ final class PositionCalculator: NSObject {
     static let shared = PositionCalculator()
     private let baseURLAPI = "https://wifi-nav-api.herokuapp.com"
 
+    private let INF = 99999999999999999
+
 	private override init() { }
 
     func determinePosition(for measurementsCollection: MeasurementsJSONCollection) -> Location? {
         var locationsMarks = [Int: Int]()
 
         for currentScanMeasurement in measurementsCollection.measurements {
-            let currentScanMac = currentScanMeasurement.macAddress
+            let currentScanMacAddress = currentScanMeasurement.macAddress
             let currentScanSignalStrength = currentScanMeasurement.signalStrength
-            
-            var minDiff = 99999999999999999
-            var minLocationID = 0
 
-            guard let searchResults = searchForOldMeasurements(for: currentScanMac)?.results else { print("Not found!"); continue }
+            guard let searchResults = searchForOldMeasurements(for: currentScanMacAddress)?.results else { print("Not found!"); continue }
+
+            var minDiff = INF
+            var minLocationID = 0
             for result in searchResults {
                 let diff = abs((currentScanSignalStrength * -1) - (result.signalStrength * -1))
                 if diff < minDiff {
@@ -46,14 +48,14 @@ final class PositionCalculator: NSObject {
         }
 
         var locationID = 0
-        var count = 0
+        var maxMatches = 0
         for (key, value) in locationsMarks {
-            if value > count {
-                count = value
+            if value > maxMatches {
+                maxMatches = value
                 locationID = key
             }
         }
-        print(locationsMarks)
+
         guard let location = getLocationDetails(for: locationID) else { return nil }
         return location 
     }

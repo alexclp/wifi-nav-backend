@@ -87,9 +87,6 @@ final class NavigationEngine: NSObject {
         var visited = [Int: Bool]()
         var distance = [Int: Double]()
 
-        print("Start: \(start)")
-        print("Finish: \(finish)")
-
         guard let startLocation = NetworkingHelper.shared.fetchLocation(with: start) else { return nil }
         guard let finishLocation = NetworkingHelper.shared.fetchLocation(with: finish) else { return nil }
 
@@ -97,8 +94,8 @@ final class NavigationEngine: NSObject {
         visited[startLocation.id] = true
 
         var queue = Heap.init { (a: Int, b: Int) -> Bool in
-            var dist1 = 9999999999999999999.0
-            var dist2 = 9999999999999999999.0
+            var dist1 = self.INF
+            var dist2 = self.INF
 
             if let unwrapped = distance[a] {
                 dist1 = unwrapped
@@ -135,8 +132,6 @@ final class NavigationEngine: NSObject {
             }
         }
 
-        print(prev)
-        print(distance)
         return createPath(parentsList: prev, distances: distance, start: startLocation.id, finish: finishLocation.id)
     }
 
