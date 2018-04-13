@@ -3,14 +3,14 @@ import HTTP
 import Foundation
 
 struct Location: Decodable {
-    let x: Double
-    let y: Double
-    let latitude: Double
-    let longitude: Double
-    let standardWidth: Double
-    let standardHeight: Double
-    let roomID: Int
-    let id: Int
+    var x: Double
+    var y: Double
+    var latitude: Double
+    var longitude: Double
+    var standardWidth: Double
+    var standardHeight: Double
+    var roomID: Int
+    var id: Int
 
     init() {
         x = 0.0
@@ -25,8 +25,13 @@ struct Location: Decodable {
 }
 
 struct Edge: Decodable {
-    let rootLocationID: Int
-    let childLocationID: Int
+    var rootLocationID: Int
+    var childLocationID: Int
+
+    init() {
+        rootLocationID = 0
+        childLocationID = 0
+    }
 }
 
 final class NavigationEngine: NSObject {
@@ -43,10 +48,9 @@ final class NavigationEngine: NSObject {
 
     private let INF = 9999999999999999999.0
 
-    func createGraph() {
-        guard let locations = NetworkingHelper.shared.fetchAllLocations() else { return }
-        self.locations = locations
+    var httpClient = NetworkingHelper()
 
+    func createGraph(locations: [Location]) {
         prev = [Int: Int]()
         visited = [Int: Bool]()
         distance = [Int: Double]()
@@ -56,7 +60,7 @@ final class NavigationEngine: NSObject {
             distance[id] = INF
             prev[id] = 0
 
-            guard let currentEdges = NetworkingHelper.shared.getEdges(for: location.id) else { continue }
+            guard let currentEdges = httpClient.getEdges(for: location.id) else { continue }
 
             for edge in currentEdges {
                 if edges[edge.rootLocationID] == nil {
@@ -82,13 +86,16 @@ final class NavigationEngine: NSObject {
     }
 
     func shortestPath(start: Int, finish: Int) -> [String: Any]? {
-        createGraph()
+        guard let locations = httpClient.fetchAllLocations() else { return nil }
+        self.locations = locations
+        createGraph(locations: locations)
+
         var prev = [Int: Int]()
         var visited = [Int: Bool]()
         var distance = [Int: Double]()
 
-        guard let startLocation = NetworkingHelper.shared.fetchLocation(with: start) else { return nil }
-        guard let finishLocation = NetworkingHelper.shared.fetchLocation(with: finish) else { return nil }
+        guard let startLocation = httpClient.fetchLocation(with: start) else { return nil }
+        guard let finishLocation = httpClient.fetchLocation(with: finish) else { return nil }
 
         distance[startLocation.id] = 0
         visited[startLocation.id] = true

@@ -2,10 +2,10 @@ import Vapor
 import HTTP
 import Foundation
 
-final class NetworkingHelper: NSObject {
-    static let shared = NetworkingHelper()
+class NetworkingHelper: NSObject {
+    // static let shared = NetworkingHelper()
 
-    private override init() { }
+    // private override init() { }
 
     private let baseURLAPI = "https://wifi-nav-api.herokuapp.com"
 

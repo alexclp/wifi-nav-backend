@@ -6,6 +6,7 @@ import XCTest
 XCTMain([
     // AppTests
     testCase(PositionCalculatorTests.allTests),
+    testCase(NavigationEngineTests.allTests)
 ])
 
 #endif

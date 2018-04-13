@@ -45,7 +45,8 @@ extension Droplet {
                 try responseJSON.set("latitude", location.latitude)
                 try responseJSON.set("longitude", location.longitude)
 
-                if let room =  NetworkingHelper.shared.fetchRoom(with: location.roomID) {
+                let httpClient = NetworkingHelper()
+                if let room =  httpClient.fetchRoom(with: location.roomID) {
                     try responseJSON.set("floorNumber", room.floorNumber)
                 }
 
