@@ -1,6 +1,7 @@
 import Foundation
 
 class Utils: NSObject {
+	// Credits to Swift Algorithm Club
 	static func haversineDinstance(la1: Double, lo1: Double, la2: Double, lo2: Double, radius: Double = 6367444.7) -> Double {
 		
 		let haversin = { (angle: Double) -> Double in
